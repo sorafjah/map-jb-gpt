@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>国をクリックして音声再生</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: sans-serif;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <h2>国をクリックすると音声が流れます</h2>
+
+  <!-- 音声ファイル -->
+  <audio id="nihonAudio" src="nihon.mp3"></audio>
+  <audio id="brazilAudio" src="brazil.mp3"></audio>
+
+  <!-- 地図画像とクリック可能領域 -->
+  <img src="map-jb.png" usemap="#worldmap" alt="世界地図" width="1000">
+
+  <map name="worldmap">
+    <!-- 日本（赤の場所） -->
+    <area shape="rect" coords="760,230,800,280" alt="日本" href="#" onclick="playAudio('nihon'); return false;">
+    <!-- ブラジル（緑の場所） -->
+    <area shape="rect" coords="330,420,450,550" alt="ブラジル" href="#" onclick="playAudio('brazil'); return false;">
+  </map>
+
+  <script>
+    function playAudio(country) {
+      if (country === 'nihon') {
+        document.getElementById('nihonAudio').play();
+      } else if (country === 'brazil') {
+        document.getElementById('brazilAudio').play();
+      }
+    }
+  </script>
+</body>
+</html>
