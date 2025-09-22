@@ -1,44 +1,115 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>国をクリックして音声再生</title>
-  <style>
-    body {
-      text-align: center;
-      font-family: sans-serif;
-    }
-    img {
-      max-width: 100%;
-      height: auto;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クリッカブル世界地図</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', 'Inter', sans-serif;
+        }
+        /* イメージマップの領域にカーソルを合わせるとポインターに変わるように設定 */
+        area {
+            cursor: pointer;
+        }
+    </style>
 </head>
-<body>
-  <h2>国をクリックすると音声が流れます</h2>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-  <!-- 音声ファイル -->
-  <audio id="nihonAudio" src="nihon.mp3"></audio>
-  <audio id="brazilAudio" src="brazil.mp3"></audio>
+    <div class="text-center p-6 md:p-8 bg-white rounded-2xl shadow-lg max-w-4xl mx-auto w-11/12">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">クリッカブル世界地図</h1>
+        <p class="text-gray-600 mb-6">地図上の日本（赤）またはブラジル（緑）をクリックすると、音声が再生されます。</p>
 
-  <!-- 地図画像とクリック可能領域 -->
-  <img src="map-jb.png" usemap="#worldmap" alt="世界地図" width="1000">
+        <!-- 地図画像と、それに関連付けるイメージマップ -->
+        <div class="relative border rounded-lg overflow-hidden">
+            <!-- 画像ファイル名を .png に修正し、id を追加 -->
+            <img id="worldmap-image" src="map-jb.png" alt="世界地図" usemap="#worldmap" class="w-full h-auto">
+            
+            <!-- イメージマップの定義 -->
+            <map name="worldmap">
+                <!-- 日本のクリック領域（四角形に変更） -->
+                <area class="resizable-area" shape="rect" coords="624,193,672,277" alt="日本" title="日本" onclick="playSound('nihon-audio')">
+                
+                <!-- ブラジルのクリック領域（座標を下にずらして修正） -->
+                <area class="resizable-area" shape="poly" coords="870,330,940,350,960,390,940,470,885,500,845,460,845,400,850,340" alt="ブラジル" title="ブラジル" onclick="playSound('brazil-audio')">
+            </map>
+        </div>
 
-  <map name="worldmap">
-    <!-- 日本（赤の場所） -->
-    <area shape="rect" coords="760,230,800,280" alt="日本" href="#" onclick="playAudio('nihon'); return false;">
-    <!-- ブラジル（緑の場所） -->
-    <area shape="rect" coords="330,420,450,550" alt="ブラジル" href="#" onclick="playAudio('brazil'); return false;">
-  </map>
+        <!-- 再生する音声ファイルをあらかじめ読み込んでおく -->
+        <audio id="nihon-audio" src="nihon.mp3" preload="auto"></audio>
+        <audio id="brazil-audio" src="brazil.mp3" preload="auto"></audio>
 
-  <script>
-    function playAudio(country) {
-      if (country === 'nihon') {
-        document.getElementById('nihonAudio').play();
-      } else if (country === 'brazil') {
-        document.getElementById('brazilAudio').play();
-      }
-    }
-  </script>
+    </div>
+
+    <script>
+        // 音声を再生するための関数
+        function playSound(audioId) {
+            const audio = document.getElementById(audioId);
+            if (audio) {
+                // もし他の音声が再生中であれば、一旦すべて停止する
+                document.querySelectorAll('audio').forEach(a => {
+                    a.pause();
+                    a.currentTime = 0; // 再生位置を先頭に戻す
+                });
+                
+                // クリックされた音声を再生する
+                audio.play().catch(error => {
+                    // ユーザー操作なしで再生しようとするとエラーになることがあるため、コンソールに出力
+                    console.error("音声の再生に失敗しました:", error);
+                });
+            }
+        }
+
+        /**
+         * レスポンシブ対応のためのイメージマップ座標調整
+         * 画像の表示サイズに合わせて、クリック領域の座標を再計算します。
+         */
+        function resizeImageMap() {
+            const image = document.getElementById('worldmap-image');
+            // 画像の本来のサイズ (この値は実際の元画像サイズに合わせてください)
+            const originalWidth = 1024; 
+
+            // 現在表示されている画像の横幅
+            const currentWidth = image.offsetWidth;
+
+            // 画像がまだ表示されていない、または非表示の場合は処理を中断
+            if (currentWidth === 0) return;
+
+            // サイズの比率を計算
+            const ratio = currentWidth / originalWidth;
+
+            const areas = document.querySelectorAll('.resizable-area');
+
+            areas.forEach(area => {
+                // オリジナルの座標を初回のみdata属性に保存しておく
+                if (!area.dataset.originalCoords) {
+                    area.dataset.originalCoords = area.getAttribute('coords');
+                }
+
+                const originalCoords = area.dataset.originalCoords.split(',').map(Number);
+                const newCoords = originalCoords.map(coord => Math.round(coord * ratio));
+
+                area.setAttribute('coords', newCoords.join(','));
+            });
+        }
+
+        // ページの読み込み時とウィンドウサイズ変更時に座標を再計算
+        window.addEventListener('load', () => {
+             // 画像の読み込み完了を待ってから初回リサイズを実行
+            const image = document.getElementById('worldmap-image');
+            if (image.complete) {
+                resizeImageMap();
+            } else {
+                image.addEventListener('load', resizeImageMap);
+            }
+        });
+        window.addEventListener('resize', resizeImageMap);
+    </script>
+
 </body>
 </html>
+
