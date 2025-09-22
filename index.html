@@ -42,13 +42,13 @@
 
       console.log(`クリック座標: ${imgX}, ${imgY}`);
 
-      // 日本（広めに設定：x480-540, y300-370）
-      if (imgX > 480 && imgX < 540 && imgY > 300 && imgY < 370) {
+      // 日本（日本海・太平洋も含めて広め）
+      if (imgX > 450 && imgX < 560 && imgY > 280 && imgY < 390) {
         audioNihon.play()
           .then(() => console.log("日本の音声再生OK"))
           .catch(err => console.error("日本の音声再生エラー:", err));
       }
-      // ブラジル（広めに設定：x900-1050, y450-600）
+      // ブラジル
       else if (imgX > 900 && imgX < 1050 && imgY > 450 && imgY < 600) {
         audioBrazil.play()
           .then(() => console.log("ブラジルの音声再生OK"))
