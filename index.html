@@ -5,26 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>日本とブラジル音声マップ</title>
   <style>
-    body { text-align: center; }
-    img { max-width: 100%; height: auto; }
+    body {
+      text-align: center;
+      font-family: sans-serif;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <h2>日本とブラジルを押して音をきこう！</h2>
 
+  <!-- 音声ファイル -->
   <audio id="audio-nihon" src="nihon.mp3"></audio>
   <audio id="audio-brazil" src="brazil.mp3"></audio>
 
-  <!-- ここで画像にIDをつける -->
+  <!-- 画像 -->
   <img id="map" src="map-jb.png" alt="map">
 
   <script>
-    // 画像と音声を取得
     const mapImg = document.getElementById('map');
     const audioNihon = document.getElementById('audio-nihon');
     const audioBrazil = document.getElementById('audio-brazil');
 
-    // 画像クリックイベント
     mapImg.addEventListener('click', function(event) {
       const rect = mapImg.getBoundingClientRect();
       const x = event.clientX - rect.left;
@@ -36,13 +42,13 @@
 
       console.log(`クリック座標: ${imgX}, ${imgY}`);
 
-      // 日本の範囲（広めに）
-      if (imgX > 500 && imgX < 650 && imgY > 250 && imgY < 400) {
+      // 日本（広めに設定：x480-540, y300-370）
+      if (imgX > 480 && imgX < 540 && imgY > 300 && imgY < 370) {
         audioNihon.play()
           .then(() => console.log("日本の音声再生OK"))
           .catch(err => console.error("日本の音声再生エラー:", err));
       }
-      // ブラジルの範囲（広めに）
+      // ブラジル（広めに設定：x900-1050, y450-600）
       else if (imgX > 900 && imgX < 1050 && imgY > 450 && imgY < 600) {
         audioBrazil.play()
           .then(() => console.log("ブラジルの音声再生OK"))
