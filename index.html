@@ -1,49 +1,26 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>日本とブラジル音声マップ</title>
-  <style>
-    body { text-align: center; }
-    img { max-width: 100%; height: auto; }
-  </style>
-</head>
-<body>
-  <h2>日本とブラジルを押して音をきこう！</h2>
+<script>
+  mapImg.addEventListener('click', function(event) {
+    const rect = mapImg.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const scaleX = mapImg.naturalWidth / mapImg.clientWidth;
+    const scaleY = mapImg.naturalHeight / mapImg.clientHeight;
+    const imgX = x * scaleX;
+    const imgY = y * scaleY;
 
-  <audio id="audio-nihon" src="nihon.mp3"></audio>
-  <audio id="audio-brazil" src="brazil.mp3"></audio>
+    console.log(`クリック座標: ${imgX}, ${imgY}`);
 
-  <img id="map" src="map-jb.png" alt="map">
-
-  <script>
-    const mapImg = document.getElementById('map');
-    const audioNihon = document.getElementById('audio-nihon');
-    const audioBrazil = document.getElementById('audio-brazil');
-
-    mapImg.addEventListener('click', function(event) {
-      const rect = mapImg.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-
-      // 画像の実際の表示サイズに基づいて座標を正規化
-      const scaleX = mapImg.naturalWidth / mapImg.clientWidth;
-      const scaleY = mapImg.naturalHeight / mapImg.clientHeight;
-      const imgX = x * scaleX;
-      const imgY = y * scaleY;
-
-      console.log(`クリック座標: ${imgX}, ${imgY}`);
-
-      // 日本あたりの座標（おおざっぱ）
-      if (imgX > 820 && imgX < 880 && imgY > 250 && imgY < 320) {
-        audioNihon.play();
-      }
-      // ブラジルあたりの座標（おおざっぱ）
-      else if (imgX > 370 && imgX < 470 && imgY > 470 && imgY < 560) {
-        audioBrazil.play();
-      }
-    });
-  </script>
-</body>
-</html>
+    // 広めの範囲に変更（例: 日本 500-650 x 250-400）
+    if (imgX > 500 && imgX < 650 && imgY > 250 && imgY < 400) {
+      audioNihon.play()
+        .then(() => console.log("日本の音声再生OK"))
+        .catch(err => console.error("日本の音声再生エラー:", err));
+    }
+    // ブラジルも広め（例: x: 900-1050, y: 450-600）
+    else if (imgX > 900 && imgX < 1050 && imgY > 450 && imgY < 600) {
+      audioBrazil.play()
+        .then(() => console.log("ブラジルの音声再生OK"))
+        .catch(err => console.error("ブラジルの音声再生エラー:", err));
+    }
+  });
+</script>
